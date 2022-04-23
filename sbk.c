@@ -2237,7 +2237,8 @@ sbk_free_message_list(struct sbk_message_list *lst)
 	"date AS date_received, "					\
 	"type, "							\
 	"thread_id, "							\
-	"NULL "				/* reactions */			\
+	"NULL, "				/* reactions */			\
+	"NULL "				/* quote_id */			\
 	"FROM sms "
 
 /* For database versions >= SBK_DB_VERSION_REACTIONS */
@@ -2251,7 +2252,8 @@ sbk_free_message_list(struct sbk_message_list *lst)
 	"date AS date_received, "					\
 	"type, "							\
 	"thread_id, "							\
-	"reactions "							\
+	"reactions, "							\
+	"NULL "				/* quote_id */			\
 	"FROM sms "
 
 /* For database versions < SBK_DB_VERSION_REACTIONS */
@@ -2265,7 +2267,8 @@ sbk_free_message_list(struct sbk_message_list *lst)
 	"date_received, "						\
 	"msg_box, "			/* sms.type */			\
 	"thread_id, "							\
-	"NULL "				/* reactions */			\
+	"NULL, "				/* reactions */			\
+	"NULL "				/* quote_id */			\
 	"FROM mms "
 
 /* For database versions >= SBK_DB_VERSION_REACTIONS */
@@ -2279,7 +2282,8 @@ sbk_free_message_list(struct sbk_message_list *lst)
 	"date_received, "						\
 	"msg_box, "			/* type */			\
 	"thread_id, "							\
-	"reactions "							\
+	"reactions, "							\
+	"quote_id "							\
 	"FROM mms "
 
 #define SBK_MESSAGES_WHERE_THREAD					\
@@ -2329,6 +2333,7 @@ sbk_free_message_list(struct sbk_message_list *lst)
 #define SBK_MESSAGES_COLUMN_TYPE		6
 #define SBK_MESSAGES_COLUMN_THREAD_ID		7
 #define SBK_MESSAGES_COLUMN_REACTIONS		8
+#define SBK_MESSAGES_COLUMN_QUOTE_ID		9
 
 static struct sbk_message *
 sbk_get_message(struct sbk_ctx *ctx, sqlite3_stmt *stm)
@@ -2366,6 +2371,9 @@ sbk_get_message(struct sbk_ctx *ctx, sqlite3_stmt *stm)
 	    SBK_MESSAGES_COLUMN_DATE_RECEIVED);
 	msg->type = sqlite3_column_int(stm, SBK_MESSAGES_COLUMN_TYPE);
 	msg->thread = sqlite3_column_int(stm, SBK_MESSAGES_COLUMN_THREAD_ID);
+
+	msg->quote_id = sqlite3_column_int64(stm,
+	    SBK_MESSAGES_COLUMN_QUOTE_ID);
 
 	if (sbk_get_body(msg) == -1)
 		goto error;

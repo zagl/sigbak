@@ -59,12 +59,12 @@ csv_print_quoted_string(FILE *fp, const char *str)
 }
 
 static void
-csv_write_record(FILE *fp, uint64_t time_sent, uint64_t time_recv,
+csv_write_record(FILE *fp, uint64_t time_sent, uint64_t time_recv, uint64_t quote_id,
     int thread, int type, int nattachments, const char *addr,
     const char *name, const char *text)
 {
-	fprintf(fp, "%" PRIu64 ",%" PRIu64 ",%d,%d,%d,",
-	    time_sent, time_recv, thread, type, nattachments);
+	fprintf(fp, "%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%d,%d,%d,",
+	    time_sent, time_recv, quote_id, thread, type, nattachments);
 
 	csv_print_quoted_string(fp, addr);
 	putc(',', fp);
@@ -93,6 +93,7 @@ csv_write_message(FILE *fp, struct sbk_message *msg)
 	csv_write_record(fp,
 	    msg->time_sent,
 	    msg->time_recv,
+	    msg->quote_id,
 	    msg->thread,
 	    sbk_is_outgoing_message(msg),
 	    nattachments,
@@ -105,6 +106,7 @@ csv_write_message(FILE *fp, struct sbk_message *msg)
 			csv_write_record(fp,
 			    rct->time_sent,
 			    rct->time_recv,
+			    msg->quote_id,
 			    msg->thread,
 			    2,
 			    0,

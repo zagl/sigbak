@@ -177,6 +177,7 @@ struct sbk_message {
 	int		 type;
 	int		 thread;
 	char		*text;
+	uint64_t	 quote_id;
 	struct sbk_attachment_list *attachments;
 	struct sbk_mention_list *mentions;
 	struct sbk_reaction_list *reactions;
